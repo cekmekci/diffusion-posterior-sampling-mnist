@@ -90,7 +90,8 @@ def main():
     # Prepare dataloader
     data_config = task_config['data']
     transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+                                    # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+                                    transforms.Normalize((0.5,), (0.5,))])
     dataset = get_dataset(**data_config, transforms=transform)
     loader = get_dataloader(dataset, batch_size=1, num_workers=0, train=False)
 
@@ -136,48 +137,29 @@ def main():
         # Compute the predictive mean
         print(samples.shape)
         pred_mean = torch.mean(samples, (0))
-        pred_mean = clear_color(pred_mean)
+        # pred_mean = clear_color(pred_mean)
 
         # Calculate the predictive variance
         pred_var = torch.var(samples, (0)).detach().cpu().numpy()
 
         # Normalize the generated generated samples to [0,1]
-        normalized_samples = np.zeros((T_1,ref_img.shape[2],ref_img.shape[3],ref_img.shape[1]))
-        for t1 in range(T_1):
-            sample = samples[t1,:,:,:]
-            normalized_sample = clear_color(sample)
-            normalized_samples[t1,:,:,:] = normalized_sample
+        # normalized_samples = np.zeros((T_1,ref_img.shape[2],ref_img.shape[3],ref_img.shape[1]))
+        # for t1 in range(T_1):
+        #    sample = samples[t1,:,:,:]
+        #    normalized_sample = clear_color(sample)
+        #    normalized_samples[t1,:,:,:] = normalized_sample
 
-        # save the results as a npz file (buradayiz)
-        np.savez_compressed(os.path.join(out_path, fname[:-4]+"_"+str(i)+".npz"),
-            gt = clear_color(ref_img),
-            measurement = clear_color(y_n),
-            generated_samples = normalized_samples,
+        # save the results as a npz file
+        result_name = os.path.join(out_path, fname[:-4] + "_" + str(i) + "_" +model_config['model_path'].split("/")[-1] + ".npz")
+        np.savez_compressed(,
+            # gt = clear_color(ref_img),
+            gt = ref_img,
+            # measurement = clear_color(y_n),
+            measurement = y_n,
+            # generated_samples = normalized_samples,
+            generated_samples = samples,
             pred_mean = pred_mean,
             pred_var = pred_var)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
