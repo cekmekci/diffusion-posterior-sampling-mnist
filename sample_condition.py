@@ -151,7 +151,7 @@ def main():
 
         # save the results as a npz file
         result_name = os.path.join(out_path, fname[:-4] + "_" + str(i) + "_" +model_config['model_path'].split("/")[-1] + ".npz")
-        np.savez_compressed(,
+        np.savez_compressed(result_name,
             # gt = clear_color(ref_img),
             gt = ref_img,
             # measurement = clear_color(y_n),
