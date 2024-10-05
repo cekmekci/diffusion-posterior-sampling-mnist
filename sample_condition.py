@@ -133,33 +133,25 @@ def main():
         set_seed(i)
         # Generate a sample from the posterior distribution
         samples = sample_fn(x_start=x_start, measurement=y_n_rep, record=False, save_root=out_path)
+        samples = samples.detach().cpu()
 
         # Compute the predictive mean
-        print(samples.shape)
         pred_mean = torch.mean(samples, (0))
         # pred_mean = clear_color(pred_mean)
 
         # Calculate the predictive variance
-        pred_var = torch.var(samples, (0)).detach().cpu().numpy()
-
-        # Normalize the generated generated samples to [0,1]
-        # normalized_samples = np.zeros((T_1,ref_img.shape[2],ref_img.shape[3],ref_img.shape[1]))
-        # for t1 in range(T_1):
-        #    sample = samples[t1,:,:,:]
-        #    normalized_sample = clear_color(sample)
-        #    normalized_samples[t1,:,:,:] = normalized_sample
+        pred_var = torch.var(samples, (0))
 
         # save the results as a npz file
         result_name = os.path.join(out_path, fname[:-4] + "_" + str(i) + "_" +model_config['model_path'].split("/")[-1] + ".npz")
         np.savez_compressed(result_name,
-            # gt = clear_color(ref_img),
-            gt = ref_img,
-            # measurement = clear_color(y_n),
-            measurement = y_n,
-            # generated_samples = normalized_samples,
-            generated_samples = samples,
-            pred_mean = pred_mean,
-            pred_var = pred_var)
+            gt = ref_img.detach().cpu().numpy(),
+            measurement = y_n.detach().cpu().numpy(),
+            generated_samples = samples.detach().cpu().numpy(),
+            pred_mean = pred_mean.detach().cpu().numpy(),
+            pred_var = pred_var.detach().cpu().numpy())
+
+
 
 
 if __name__ == '__main__':
