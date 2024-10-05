@@ -176,7 +176,7 @@ def random_sq_bbox(img, mask_shape, image_size=256, margin=(16, 16)):
 
 class mask_generator:
     def __init__(self, mask_type, mask_len_range=None, mask_prob_range=None,
-                 image_size=256, margin=(16, 16)):
+                 image_size=32, margin=(2, 2)):
         """
         (mask_len_range): given in (min, max) tuple.
         Specifies the range of box size in each dimension
@@ -210,7 +210,7 @@ class mask_generator:
         samples = np.random.choice(self.image_size * self.image_size, int(total * prob), replace=False)
         mask_vec[:, samples] = 0
         mask_b = mask_vec.view(1, self.image_size, self.image_size)
-        mask_b = mask_b.repeat(3, 1, 1)
+        # mask_b = mask_b.repeat(3, 1, 1)
         mask = torch.ones_like(img, device=img.device)
         mask[:, ...] = mask_b
         return mask
