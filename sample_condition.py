@@ -152,7 +152,5 @@ def main():
             pred_var = pred_var.detach().cpu().numpy())
 
 
-
-
 if __name__ == '__main__':
     main()
