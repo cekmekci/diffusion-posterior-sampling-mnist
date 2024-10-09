@@ -107,6 +107,9 @@ def main():
         fname = str(i).zfill(5) + '.png'
         ref_img = ref_img.to(device)
 
+        # Fix the seed for the ith test example
+        set_seed(i)
+
         # Exception) In case of inpainging,
         if measure_config['operator'] ['name'] == 'inpainting':
             mask = mask_gen(ref_img)
@@ -123,14 +126,15 @@ def main():
             y = operator.forward(ref_img)
             y_n = noiser(y)
 
-        T_1 = 32 # samples from the latent variable
+        T_1 = 128 # samples from the latent variable
+
+        # Fix the seed for the ith test example
+        set_seed(i)
 
         # Generate an initialization of the latent variable
         x_start = torch.randn((T_1,ref_img.shape[1],ref_img.shape[2],ref_img.shape[3]), device=device).requires_grad_()
         y_n_rep = y_n.repeat(T_1, 1, 1, 1)
 
-        # Fix the seed for the ith test example
-        set_seed(i)
         # Generate a sample from the posterior distribution
         samples = sample_fn(x_start=x_start, measurement=y_n_rep, record=False, save_root=out_path)
         samples = samples.detach().cpu()
@@ -143,13 +147,13 @@ def main():
         pred_var = torch.var(samples, (0))
 
         # save the results as a npz file
-        result_name = os.path.join(out_path, fname[:-4] + "_" + str(i) + "_" +model_config['model_path'].split("/")[-1] + ".npz")
+        result_name = os.path.join(out_path, fname[:-4] + "_" +model_config['model_path'].split("/")[-1] + ".npz")
         np.savez_compressed(result_name,
-            gt = ref_img.detach().cpu().numpy(),
-            measurement = y_n.detach().cpu().numpy(),
-            generated_samples = samples.detach().cpu().numpy(),
-            pred_mean = pred_mean.detach().cpu().numpy(),
-            pred_var = pred_var.detach().cpu().numpy())
+            gt = ref_img.detach().cpu().numpy()[0,0,:,:], # (32,32)
+            measurement = y_n.detach().cpu().numpy()[0,0,:,:], # (32,32)
+            generated_samples = samples.detach().cpu().numpy()[:,0,:,:], # (128,32,32)
+            pred_mean = pred_mean.detach().cpu().numpy()[0,:,:], # (32,32)
+            pred_var = pred_var.detach().cpu().numpy()[0,:,:]) # (32,32)
 
 
 if __name__ == '__main__':
