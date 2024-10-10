@@ -31,7 +31,7 @@ To run the code, follow these steps:
 2. Execute the following command to run the code:
 
 ```
-python sample_condition.py --model_config=configs/model_config.yaml --diffusion_config=configs/diffusion_config.yaml --task_config=configs/inpainting_config.yaml
+python sample_dps.py --model_config=configs/model_config.yaml --diffusion_config=configs/diffusion_config.yaml --task_config=configs/inpainting_config.yaml
 ```
 
 
